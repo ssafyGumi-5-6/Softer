@@ -24,12 +24,21 @@ public class Solution {
         while(tokenizer.hasMoreTokens()) list.add(Integer.parseInt(tokenizer.nextToken()));
         score = list.stream().mapToInt(Integer::intValue).toArray();
 
+        dp[0] = score[0];
+        for(int i = 1 ; i < N; i++){
+            dp[i] = dp[i - 1] + score[i];
+        }
+
         for(int i = 0 ; i < K; i++){
             tokenizer = new StringTokenizer(reader.readLine());
-            int startIndex = Integer.parseInt(tokenizer.nextToken());
-            int endIndex = Integer.parseInt(tokenizer.nextToken());
+            int startIndex = Integer.parseInt(tokenizer.nextToken()) - 1;
+            int endIndex = Integer.parseInt(tokenizer.nextToken()) - 1;
 
+            double share = (double)(dp[endIndex] - dp[startIndex] + score[startIndex]) / (endIndex - startIndex + 1) * 100;
+            double answer = Math.ceil(share) / 100;
+            builder.append(String.format("%.2f",answer)).append("\n");
         }
+        System.out.print(builder);
 
         reader.close();
     }
