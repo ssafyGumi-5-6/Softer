@@ -1,0 +1,32 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
+
+        st = new StringTokenizer(br.readLine(), " ");
+        int N = Integer.parseInt(st.nextToken());
+        int K = Integer.parseInt(st.nextToken());
+        st = new StringTokenizer(br.readLine(), " ");
+        int [] data = new int [N+1];
+        for (int i = 1; i <= N; i++) {
+            data[i] = data[i-1] + Integer.parseInt(st.nextToken());
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < K; i++) {
+            st = new StringTokenizer(br.readLine(), " ");
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+
+            String avg = String.format("%.2f", Math.round(((double) (data[b] - data[a-1]) / (b - a + 1)) * 100) / (double)100);
+            sb.append(avg + "\n");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        System.out.println(sb);
+    }
+}
