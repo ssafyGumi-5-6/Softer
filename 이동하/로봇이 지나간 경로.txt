@@ -1,0 +1,128 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+class Node {
+    int r, c, d;
+    Node (int r, int c, int d) {
+        this.r = r;
+        this.c = c;
+        this.d = d;
+    }
+}
+
+public class Main {
+    static int H, W, step_count;
+    static int [] [] delta = {{0,1},{1,0},{0,-1},{-1,0}};
+    static char [] delta_char = {'>','v','<','^'};
+    static char [] [] board;
+    static boolean [] [] [] visit;
+    static Stack<Character> command_line;
+    static StringBuilder sb = new StringBuilder();
+    static boolean flag = false;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
+
+        st = new StringTokenizer(br.readLine(), " ");
+        H = Integer.parseInt(st.nextToken());
+        W = Integer.parseInt(st.nextToken());
+        board = new char [H+1][W+1];
+        ArrayList<Node> start_point = new ArrayList<>();
+        step_count = 0;
+        for (int i = 1; i <= H; i++) {
+            String s = br.readLine();
+            for (int j = 1; j <= W; j++) {
+                board[i][j] = s.charAt(j-1);
+                if (board[i][j] == '#') {
+                    step_count++;
+                    for (int k = 0; k < 4; k++) {
+                        start_point.add(new Node(i, j, k));
+                    }
+                }
+            }
+        }
+
+        for (Node start_node : start_point) {
+            int next_r1 = start_node.r + delta[start_node.d][0];
+            int next_c1 = start_node.c + delta[start_node.d][1];
+            int next_r2 = start_node.r + 2*delta[start_node.d][0];
+            int next_c2 = start_node.c + 2*delta[start_node.d][1];
+
+            if (next_r2 <= 0 || next_r2 > H || next_c2 <= 0 || next_c2 > W) continue;
+            if (board[next_r1][next_c1] == '.' || board[next_r2][next_c2] == '.') continue;
+
+            visit = new boolean [H+1] [W+1] [4];
+
+            visit[start_node.r][start_node.c][start_node.d] = true;
+            visit[next_r1][next_c1][start_node.d] = true;
+            visit[next_r2][next_c2][start_node.d] = true;
+
+            command_line = new Stack<>();
+            command_line.push('A');
+
+            dfsing(new Node(next_r2, next_c2, start_node.d), step_count - 3);
+            if (flag == true) {
+                System.out.println(start_node.r + " " + start_node.c);
+                System.out.println(delta_char[start_node.d]);
+                System.out.println(sb);
+                return;
+            }
+        }
+    }
+    static void dfsing(Node node, int nokori) {
+        if (nokori == 0) {
+//            System.out.println(" * " + command_line);
+            for (char c : command_line) sb.append(c);
+            flag = true;
+            return;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if (i == 2) continue;
+            int next_d = (node.d + i) % 4;
+            int next_r1 = node.r + delta[next_d][0];
+            int next_c1 = node.c + delta[next_d][1];
+            int next_r2 = node.r + 2*delta[next_d][0];
+            int next_c2 = node.c + 2*delta[next_d][1];
+
+            if (next_r2 <= 0 || next_r2 > H || next_c2 <= 0 || next_c2 > W) continue;
+            if (board[next_r1][next_c1] == '.' || board[next_r2][next_c2] == '.') continue;
+            if (visit[next_r1][next_c1][next_d] == true || visit[next_r2][next_c2][next_d] == true) continue;
+
+            visit[next_r1][next_c1][node.d] = true;
+            visit[next_r2][next_c2][node.d] = true;
+
+            if (i == 0) {
+                command_line.push('A');
+                dfsing(new Node(next_r2, next_c2, next_d), nokori - 2);
+                command_line.pop();
+            } else if (i == 1) {
+                command_line.push('R');
+                command_line.push('A');
+                dfsing(new Node(next_r2, next_c2, next_d), nokori - 2);
+                command_line.pop();
+                command_line.pop();
+            } else {
+                command_line.push('L');
+                command_line.push('A');
+                dfsing(new Node(next_r2, next_c2, next_d), nokori - 2);
+                command_line.pop();
+                command_line.pop();
+            }
+
+            visit[next_r1][next_c1][node.d] = false;
+            visit[next_r2][next_c2][node.d] = false;
+        }
+    }
+}
+
+/*
+5 8
+#######.
+........
+........
+........
+........
+ */
