@@ -1,4 +1,4 @@
-package Softeer.LV3.로이_지나간_경로;
+package Softeer.LV3.로봇이_지나간_경로;
 
 import java.util.*;
 import java.io.*;
