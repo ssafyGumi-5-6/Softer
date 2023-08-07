@@ -3,6 +3,6 @@
 
 Softer 문제 풀고 제출
 
-[Softer 클릭](https://softeer.ai/practice/index.do)
+노션 주소 : https://www.notion.so/Softeer-ad1b56879eed4f9e950932def1701d41
 
 &nbsp;
