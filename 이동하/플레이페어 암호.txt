@@ -1,0 +1,92 @@
+import java.util.*;
+import java.io.*;
+
+class Node {
+    int r, c;
+    Node (int r, int c) {
+        this.r = r;
+        this.c = c;
+    }
+}
+
+public class Main {
+    public static void main(String args[]) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String message = br.readLine();
+        String key = br.readLine();
+
+        int index = 0;
+        char [] [] board = new char [5] [5];
+        HashSet<Character> used_set = new HashSet<>();
+        HashMap<Character, Node> mapper = new HashMap<>();
+        for (int i = 0; i < key.length(); i++) {
+            char temp = key.charAt(i);
+            if (used_set.contains(temp)) continue;
+            used_set.add(temp);
+            board[index/5][index%5] = temp;
+            mapper.put(temp, new Node(index/5, index%5));
+            index++;
+        }
+        for (char i = 'A'; i <= 'Z'; i++) {
+            if (i == 'J') continue;
+            if (used_set.contains(i)) continue;
+            board[index/5][index%5] = i;
+            mapper.put(i, new Node(index/5, index%5));
+            index++;
+        }
+
+
+        StringBuilder sb = new StringBuilder();
+        ArrayList<String> new_message = new ArrayList<>();
+        for (int i = 0; i < message.length(); i++) {
+            char temp = message.charAt(i);
+            if (sb.length() == 0) sb.append(temp);
+            else {
+                if (sb.toString().charAt(0) == temp) {
+                    if (temp == 'X') {
+                        sb.append('Q');
+                    } else {
+                        sb.append('X');
+                    }
+                    new_message.add(sb.toString());
+                    sb = new StringBuilder();
+                    sb.append(temp);
+                } else {
+                    sb.append(temp);
+                    new_message.add(sb.toString());
+                    sb = new StringBuilder();
+                }
+            }
+        }
+        if (sb.length() == 1) {
+            sb.append('X');
+            new_message.add(sb.toString());
+        }
+
+        StringBuilder answer = new StringBuilder();
+        for (String segment : new_message) {
+            char a = segment.charAt(0);
+            char b = segment.charAt(1);
+            Node node_a = mapper.get(a);
+            Node node_b = mapper.get(b);
+
+            char new_a = '.';
+            char new_b = '.';
+
+            if (node_a.r == node_b.r) {
+                new_a = board[node_a.r][(node_a.c + 1) % 5];
+                new_b = board[node_b.r][(node_b.c + 1) % 5];
+            } else if (node_a.c == node_b.c) {
+                new_a = board[(node_a.r + 1) % 5][node_a.c];
+                new_b = board[(node_b.r + 1) % 5][node_b.c];
+            } else {
+                new_a = board[node_a.r][node_b.c];
+                new_b = board[node_b.r][node_a.c];
+            }
+            
+            answer.append(new_a);
+            answer.append(new_b);
+        }
+        System.out.println(answer);
+    }
+}
