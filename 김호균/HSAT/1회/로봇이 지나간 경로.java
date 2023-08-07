@@ -18,7 +18,7 @@ public class Main
         sc.nextLine();
 
         board = new char[H][W];
-       
+
         a = -1;
         b = -1;
         dir = 'x';
@@ -31,26 +31,24 @@ public class Main
             for(int j = 0; j < W; ++j) {
                 if(board[i][j] == '#') {
 
-                    // 처음 발견한 #이 아래와 오른쪽 연결밖에 없다.
-                    // 아래로 연결되면 ^ 이 방향으로 도착이므로 거꾸로 진행 좌회전이 우회전 우회전이 좌회전
-                    // 오른쪽 연결이면 > 이 방향으로 시작이므로 정방향 진행
-
                     if(i + 1 < H && board[i + 1][j] == '#') {
-                        // 아래 역방향 진행, 출발지점 찾는 과정
                         if(j + 1 < W && board[i][j + 1] == '#') {
-                            // 정방향 진행, 도착지점 찾는 과정 추가
+                            // 출발지점 찾는 과정, 도착지점 찾는 과정 추가
                             findStartInit('>', sb, i, j);
                             findEnd('>', sb, i, j);
                         } else {
-                            findStart('^', sb, i, j);
+                            // 출발지점 찾는 과정
+                            findStartInit('^', sb, i, j);
                         }
-
                     } else if(j + 1 < W && board[i][j + 1] == '#') {
+                        // 현재 위치가 시작지점이므로 도착지점만 찾으면 된다.
                         a = i + 1;
                         b = j + 1;
                         dir = '>';
                         findEnd('>', sb, i, j);
                     }
+
+                    break;
                 }
             }
         }
@@ -61,51 +59,16 @@ public class Main
         sc.close();
     }
 
-    private static char findStartInit(char nextDir, StringBuilder command, int y, int x) {
+    private static void findStartInit(char nextDir, StringBuilder command, int y, int x) {
 
         board[y][x] = '.';
-        char previousDir = 'x';
-        char currentDir = 'x';
+        char currentDir = '^';
 
-        int ny = y + 2;
-        int nx = x;
-
-        currentDir = '^';
-
-
-        findStart(currentDir, command, ny, nx);
-    
+        findStart(currentDir, command, y + 2, x);
 
         command.append('A');
-        if(nextDir == '^') {
-            if(currentDir == '>') {
-                command.append('L');
-            } else if(currentDir == '<') {
-                command.append('R');
-            }
-        } else if(nextDir == 'v') {
-            if(currentDir == '>') {
-                command.append('R');
-            } else if(currentDir == '<') {
-                command.append('L');
-            }
-        } else if(nextDir == '<') {
-            if(currentDir == '^') {
-                command.append('L');
-            } else if(currentDir == 'v') {
-                command.append('R');
-            }
-        } else if(nextDir == '>') {
-            if(currentDir == '^') {
-                command.append('R');
-            } else if(currentDir == 'v') {
-                command.append('L');
-            }
-        }
-
-        return currentDir;
+        command.append(selectDir(nextDir, currentDir));
     }
-
     private static char findStart(char nextDir, StringBuilder command, int y, int x) {
         int[] dy = {-1, 1, 0, 0};
         int[] dx = {0, 0, 1, -1};
@@ -128,7 +91,7 @@ public class Main
             if(ny < 0 || nx < 0 || ny >= H || nx >= W || board[ny][nx] == '.') {
                 continue;
             }
-            
+
             switch(d) {
                 case 0:
                     currentDir = 'v';
@@ -158,31 +121,7 @@ public class Main
         }
 
         command.append('A');
-        if(nextDir == '^') {
-            if(currentDir == '>') {
-                command.append('L');
-            } else if(currentDir == '<') {
-                command.append('R');
-            }
-        } else if(nextDir == 'v') {
-            if(currentDir == '>') {
-                command.append('R');
-            } else if(currentDir == '<') {
-                command.append('L');
-            }
-        } else if(nextDir == '<') {
-            if(currentDir == '^') {
-                command.append('L');
-            } else if(currentDir == 'v') {
-                command.append('R');
-            }
-        } else if(nextDir == '>') {
-            if(currentDir == '^') {
-                command.append('R');
-            } else if(currentDir == 'v') {
-                command.append('L');
-            }
-        }
+        command.append(selectDir(nextDir, currentDir));
 
         return currentDir;
     }
@@ -202,14 +141,14 @@ public class Main
             if(ny < 0 || nx < 0 || ny >= H || nx >= W || board[ny][nx] == '.') {
                 continue;
             }
-            
+
             ny = ny + dy[d];
             nx = nx + dx[d];
 
             if(ny < 0 || nx < 0 || ny >= H || nx >= W || board[ny][nx] == '.') {
                 continue;
             }
-            
+
             switch(d) {
                 case 0:
                     nextDir = '^';
@@ -227,34 +166,42 @@ public class Main
                     break;
             }
 
-            if(nextDir == '^') {
-                if(currentDir == '>') {
-                    command.append('L');
-                } else if(currentDir == '<') {
-                    command.append('R');
-                }
-            } else if(nextDir == 'v') {
-                if(currentDir == '>') {
-                    command.append('R');
-                } else if(currentDir == '<') {
-                    command.append('L');
-                }
-            } else if(nextDir == '<') {
-                if(currentDir == '^') {
-                    command.append('L');
-                } else if(currentDir == 'v') {
-                    command.append('R');
-                }
-            } else if(nextDir == '>') {
-                if(currentDir == '^') {
-                    command.append('R');
-                } else if(currentDir == 'v') {
-                    command.append('L');
-                }
-            }
-
+            command.append(selectDir(nextDir, currentDir));
             command.append('A');
+
             findEnd(nextDir, command, ny, nx);
         }
     }
+
+    private static String selectDir(char nextDir, char currentDir) {
+        if(nextDir == '^') {
+            if(currentDir == '>') {
+                return "L";
+            } else if(currentDir == '<') {
+                return "R";
+            }
+        } else if(nextDir == 'v') {
+            if(currentDir == '>') {
+                return "R";
+            } else if(currentDir == '<') {
+                return "L";
+            }
+        } else if(nextDir == '<') {
+            if(currentDir == '^') {
+                return "L";
+            } else if(currentDir == 'v') {
+                return "R";
+            }
+        } else if(nextDir == '>') {
+            if(currentDir == '^') {
+                return "R";
+            } else if(currentDir == 'v') {
+                return "L";
+            }
+        }
+
+        return "";
+    }
 }
+
+
